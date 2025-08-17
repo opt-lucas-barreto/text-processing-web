@@ -1,0 +1,100 @@
+<div class="home-container">
+  <div class="welcome-section">
+    <h1>Gerador de Anagramas</h1>
+    <p>Bem-vindo, {{ currentUser?.username }}!</p>
+    <p class="subtitle">Digite as letras e veja todas as possibilidades de anagramas!</p>
+  </div>
+
+  <div class="form-section">
+    <form [formGroup]="anagramForm" (ngSubmit)="onSubmit()" class="anagram-form">
+      <div class="input-group">
+        <label for="letters">Letras:</label>
+        <input
+          type="text"
+          id="letters"
+          formControlName="letters"
+          class="text-input"
+          [class.invalid]="isLettersInvalid()"
+          placeholder="Digite as letras (ex: abc)"
+          maxlength="10"
+        />
+        <div class="error-message" *ngIf="isLettersInvalid()">
+          <span>⚠</span>
+          <span *ngIf="getLettersControl()?.errors?.['required']">Campo obrigatório</span>
+          <span *ngIf="getLettersControl()?.errors?.['minlength']">Mínimo 1 caractere</span>
+          <span *ngIf="getLettersControl()?.errors?.['maxlength']">Máximo 10 caracteres</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button type="submit" [disabled]="anagramForm.invalid || loading" class="submit-btn">
+          <span *ngIf="!loading">Gerar Anagramas</span>
+          <span *ngIf="loading">Gerando...</span>
+        </button>
+
+        <div class="cache-controls">
+          <button
+            type="button"
+            (click)="toggleCache()"
+            [class.active]="useCache"
+            class="cache-toggle-btn"
+          >
+            {{ useCache ? 'Cache: ON' : 'Cache: OFF' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Resultados -->
+  <div class="results-section" *ngIf="anagrams.length > 0">
+    <div class="results-header">
+      <h2>Resultados</h2>
+      <div class="result-stats">
+        <span class="stat">
+          Total: {{ totalAnagrams }}
+          <span *ngIf="fromCache" class="cache-indicator">(Cache Backend)</span>
+        </span>
+        <span class="stat">Tempo: {{ processingTime }}ms</span>
+      </div>
+    </div>
+
+    <div class="anagrams-list">
+      <div
+        *ngFor="let anagram of anagrams; trackBy: trackByIndex"
+        class="anagram-item"
+      >
+        {{ anagram }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensagem de Erro -->
+  <div class="error-section" *ngIf="error">
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-section" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Gerando anagramas...</p>
+    </div>
+  </div>
+
+  <!-- Instruções -->
+  <div class="instructions" *ngIf="anagrams.length === 0 && !loading && !error">
+    <div class="instruction-card">
+      <h3>💡 Como usar:</h3>
+      <ul>
+        <li>Digite as letras no campo acima</li>
+        <li>Os anagramas serão gerados automaticamente após parar de digitar</li>
+        <li>Use o botão "Gerar Anagramas" para forçar a geração</li>
+        <li>Ative/desative o cache conforme necessário</li>
+      </ul>
+    </div>
+  </div>
+</div>
